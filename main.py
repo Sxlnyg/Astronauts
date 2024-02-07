@@ -1,16 +1,16 @@
-import gspread
-
 from collections import Counter
 
-gc = gspread.service_account(filename='creds.json',
-                             scopes=gspread.auth.DEFAULT_SCOPES)
-spreadsheet = gc.open('astronauts')
-worksheet = spreadsheet.worksheet('astronauts')
+
+def data_read():
+    sheet_data = []
+    with open('astronauts.csv', 'r') as file:
+        for line in file:
+            sheet_data.append(line.strip().split(','))
+    return sheet_data
 
 
 def main():
-    sheet_data = worksheet.get_all_values()
-    birth_months = [int(entry[4].split('/')[0]) for entry in sheet_data[1:]]
+    birth_months = [int(entry[4].split('/')[0]) for entry in data_read()[1:]]
     month_counts = Counter(birth_months)
     sorted_months = sorted(month_counts.items(), key=lambda x: x[1], reverse=True)
     top_three_months = sorted_months[:3]
@@ -19,5 +19,6 @@ def main():
     for month, count in top_three_months:
         percentage = (count / total_births) * 100
         print(f"{month}. hónap: {percentage:.1f}%")
+
 
 main()
